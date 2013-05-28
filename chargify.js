@@ -28,7 +28,12 @@ Chargify.prototype.request = function(options, callback) {
     };
     request(options, function(err, res, body) {
         if (err) return callback(err);
-        if (res.headers['content-type'].indexOf('application/json') !== -1 && typeof body !== 'object') {
+        // Attempt to parse the response if the content-type is JSON.
+        // Some chargify end points return an single whitespace ` ` even
+        // though the content-type is `application/json`.
+        if (res.headers['content-type'].indexOf('application/json') !== -1
+            && typeof body !== 'object'
+            && body !== ' ') {
             try {
                 res.body = body = JSON.parse(body);
             } catch(e) {
